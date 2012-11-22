@@ -1,0 +1,18 @@
+
+This is a low level utility to read from a number of file descriptors that are
+assumed to produce a valid pcap dump stream and then write all packets from
+those streams to an aggregate dump stream on stdout.
+
+   Usage: merge-pcap-streams <fd1> [fd2] [fdn...]
+
+One way to use this tool is to wrap it in a program that forks a bunch of
+tcpdump child processes and then exec()s this program, passing in the
+file descriptor for the read pipe for each child process on the command line.
+In this way it's possible to produce a tool that, for example, takes a
+filter and a set of hosts and remotely executes tcpdump on those hosts
+via SSH, using merge-pcap-streams to aggregate the resulting data.
+
+Here's a dumb example using just a single fd, which kinda defeats the point
+but serves to show how you might invoke tcpdump:
+
+    tcpdump -i eth0 -U -q -w - | merge-pcap-streams 0 | tcpdump -r -
